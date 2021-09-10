@@ -56,7 +56,10 @@ module.exports = exports =
     db = new DatabaseClient logger, config
     c = CreateConnection logger, 1, connectionString
     c.set_data_cb (line) -> 
+      line = line.replace /\u0000/g, ''
+      line = line.replace /\\u0000/g, ''
       p = ParseLine line
+      return logger.info "[skip] #{p.line}" unless p.prefix is "%"
       data = p.to_json!
       timestamp = Date.now!
       db.append {data, timestamp}

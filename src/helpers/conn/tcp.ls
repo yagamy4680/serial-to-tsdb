@@ -1,5 +1,5 @@
 EventEmitter = require \events
-require! <[net]>
+require! <[net byline]>
 {BaseDriver} = require \./base
 
 ##
@@ -42,12 +42,19 @@ module.exports = exports = class TcpDriver extends BaseDriver
     {logger, name, configs, opts, hostname, port} = self = @
     logger.info "<#{name}>: connecting to #{hostname.yellow} with port #{port} ..."
     tcp = self.tcp = new net.Socket!
+    reader = self.reader = byline tcp
+    reader.on \data, (buffer) -> return self.process_data buffer
     tcp.on \error, (err) -> return self.on_error err
-    tcp.on \data, (data) -> return self.on_data data
     tcp.on \close, -> return self.on_close!
     <- tcp.connect port, hostname
     logger.info "<#{name}>: connected to #{hostname.yellow} with port #{port}"
     return self.on_connected!
+
+  process_data: (buffer) ->
+    {logger} = self = @
+    text = buffer.toString!
+    logger.debug "buffer => #{buffer.toString 'hex'} => #{text}"
+    return self.on_data text
 
   on_error: (err) ->
     {logger, name} = self = @
@@ -60,9 +67,10 @@ module.exports = exports = class TcpDriver extends BaseDriver
     self.clean_and_reset!
 
   clean_and_reset: ->
-    {tcp} = self = @
+    {tcp, reader} = self = @
+    reader.removeAllListeners \data
     tcp.removeAllListeners \error
-    tcp.removeAllListeners \data
     tcp.removeAllListeners \close
     self.tcp = null
+    self.reader = null
     self.on_disconnected!

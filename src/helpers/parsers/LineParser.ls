@@ -1,9 +1,11 @@
 
 class Packet
-  (line) ->
+  (@line) ->
     self = @
     [prefix, index, measurement, ...data] = tokens = self.tokens = line.split '\t'
     self.prefix = prefix
+    xs = {prefix, index, measurement, data}
+    # console.log "tokens => #{JSON.stringify xs}, prefix length = #{prefix.length}"
     return unless prefix is '%'
     self.index = parseInt index
     self.measurement = measurement

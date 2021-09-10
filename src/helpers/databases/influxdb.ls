@@ -1,5 +1,12 @@
 require! <[js-yaml fs request]>
 
+
+FORMAT_KEY = (k) ->
+  k = k.split '.' .join '_' 
+  k = k.split '/' .join '_'
+  return k
+
+
 ##
 # InfluxDB line protocol tutorial
 # 
@@ -8,8 +15,8 @@ require! <[js-yaml fs request]>
 SERIALIZE = (m) ->
   {timestamp, data} = m
   {measurement, fields, tags} = data
-  x0 = [ "#{k}=#{v}" for k, v of tags ]
-  x1 = [ "#{k}=#{v}" for k, v of fields ]
+  x0 = [ "#{FORMAT_KEY k}=#{v}" for k, v of tags ]
+  x1 = [ "#{FORMAT_KEY k}=#{v}" for k, v of fields ]
   xs = [measurement] ++ x0
   xs = [(xs.join ","), x1, timestamp.toString!]
   return xs.join " "
@@ -23,7 +30,7 @@ class InfluxdbClient
     logger.info "yml => #{yml}"
     logger.info "config => #{JSON.stringify config}"
     f = -> return self.at_timer_expiry!
-    setInterval f, 5000ms
+    setInterval f, 1000ms
 
   append: (m) ->
     {logger, items} = self = @
