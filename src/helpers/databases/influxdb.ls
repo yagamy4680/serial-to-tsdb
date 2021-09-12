@@ -1,4 +1,4 @@
-require! <[js-yaml fs request]>
+require! <[js-yaml fs request url]>
 
 
 FORMAT_KEY = (k) ->
@@ -42,9 +42,10 @@ class InfluxdbClient
     {logger, items, config} = self = @
     return if items.length is 0
     self.items = []
-    logger.info "flushing to influxdb ..."
-    {url, token, bucket, org} = config
-    uri = url
+    {token, bucket, org} = config
+    {hostname} = xs = url.parse config.url
+    # logger.info "flushing to influxdb (#{JSON.stringify xs}) ..."
+    uri = config.url
     body = items.join '\n'
     precision = "ms"
     qs = {bucket, org, precision}
@@ -54,8 +55,8 @@ class InfluxdbClient
     opts = {uri, qs, headers, body}
     request.post opts, (err, rsp, body) ->
       return logger.error if err?
-      return logger.error "influxdb response #{rsp.statusCode} => #{body}" unless rsp.statusCode is 204
-      return logger.info "successfully write #{items.length} records"
+      return logger.error "influxdb (#{hostname}:#{bucket}:#{org}) response #{rsp.statusCode} => #{body}" unless rsp.statusCode is 204
+      return logger.info "successfully write #{items.length} records (#{hostname}:#{bucket}:#{org})."
 
 
 module.exports = exports = InfluxdbClient

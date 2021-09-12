@@ -33,8 +33,7 @@ module.exports = exports = class SerialDriver extends BaseDriver
     stopBits = '1' unless stopBits? and \string is typeof stopBits
     stopBits = parseInt stopBits
     autoOpen = no
-    self.readline = no
-    self.readline = yes if qs.parser? and qs.parser is "readline"
+    self.readline = yes
     self.packetFilter = null
     self.pathname = filePath = pathname
     self.opts = opts = {autoOpen, baudRate, dataBits, parity, stopBits}
@@ -57,7 +56,7 @@ module.exports = exports = class SerialDriver extends BaseDriver
     p = self.p = new SerialPort pathname, opts
     if readline
       logger.info "<#{name}>: parser: ReadLine"
-      pp = self.pp = p.pipe new Readline delimiter: '\r\n'
+      pp = self.pp = p.pipe new Readline delimiter: '\n'
       pp.on \data, (data) -> return self.on_data data
     else
       pp = self.pp = null
