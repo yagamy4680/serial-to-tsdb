@@ -31,11 +31,12 @@
     "pino-pretty": "^4.1.0",
     "request": "^2.88.2",
     "serialport": "^9.0.1",
-    "systeminformation": "^5.8.7",
     "yargs": "^14.2.0"
   },
   "devDependencies": {
-    "standard-version": "^9.0.0"
+    "standard-version": "^9.0.0",
+    "systeminformation": "^5.8.7",
+    "tplink-smarthome-api": "^3.3.0"
   },
   "optionalDependencies": {},
   "scripts": {
