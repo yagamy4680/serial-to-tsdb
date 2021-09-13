@@ -56,8 +56,9 @@ class Discovery
     client.on 'plug-offline', (p) -> return self.on_plug_offline p
 
   start: (done) ->
-    {client} = self = @
-    client.startDiscovery!
+    {client, opts} = self = @
+    {broadcast} = opts
+    client.startDiscovery {broadcast}
     return done!
 
   add_and_start: (p, evt) ->
@@ -82,10 +83,13 @@ class Discovery
     {packet_index} = self = @
     self.packet_index = packet_index + 1
     return self.packet_index
-  
 
+[lsc, script, broadcast] = process.argv
+broadcast = '255.255.255.255' unless broadcast?
 
-d = new Discovery!
+console.error "argv => #{JSON.stringify process.argv}"
+
+d = new Discovery {broadcast}
 d.start (err) -> 
   return unless err?
   console.error "start discovery but failed, #{err}"
