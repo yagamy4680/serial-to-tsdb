@@ -18,10 +18,12 @@ module.exports = exports = class TcpDriver extends BaseDriver
     super ...
     {pathname, qs} = tokens
     {arg} = qs
+    self.logger.debug JSON.stringify {id, name, pathname}
+    self.logger.info "arg => #{JSON.stringify arg}"
+    arg = [arg] if arg? and 'string' is typeof arg
     arg = [] unless arg? and Array.isArray arg
     self.pathname = pathname
     self.args = arg
-    self.logger.debug JSON.stringify {id, name, pathname}
 
   ##
   # Write a chunk of bytes as data to remote. Subclass of the BaseDriver
